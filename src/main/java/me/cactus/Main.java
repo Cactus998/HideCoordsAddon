@@ -1,5 +1,6 @@
 package me.cactus;
 
+import fr.xephi.authme.api.v3.AuthMeApi;
 import fr.xephi.authme.events.LoginEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -76,7 +77,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getGameMode() == GameMode.SPECTATOR) {
+        if (player.getGameMode() == GameMode.SPECTATOR && !AuthMeApi.getInstance().isAuthenticated(player)) {
             teleport(player);
         }
     }
@@ -85,7 +86,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             Player player = event.getPlayer();
-            if (player.getGameMode() == GameMode.SPECTATOR) {
+            if (player.getGameMode() == GameMode.SPECTATOR && !AuthMeApi.getInstance().isAuthenticated(player)) {
                 event.setCancelled(true);
             }
         }
@@ -121,25 +122,10 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-        // TODO: доделать проверку на имеено использование релоад
         if (event.getPlugin().equals(this)) {
-//            getLogger().severe("==================================================");
-//            getLogger().severe("Использование /reload может навредить серверу.");
-//            getLogger().severe("Из-за несохранённых данных сервер будет выключен.");
-//            getLogger().severe("==================================================");
-            for (Map.Entry<UUID, Location> entry : playerLocations.entrySet()) {
-                UUID uuid = entry.getKey();
-                Location location = entry.getValue();
-                Player player = Bukkit.getPlayer(uuid);
-                player.teleport(location);
-            }
-            for (Map.Entry<UUID, GameMode> entry : playerGamemode.entrySet()) {
-                UUID uuid = entry.getKey();
-                GameMode gameMode = entry.getValue();
-                Player player = Bukkit.getPlayer(uuid);
-                player.setGameMode(gameMode);
+            playerLocations.forEach((uuid, location) -> Bukkit.getPlayer(uuid).teleport(location));
+            playerGamemode.forEach((uuid, gameMode) -> Bukkit.getPlayer(uuid).setGameMode(gameMode));
             }
             Bukkit.shutdown();
         }
     }
-}
