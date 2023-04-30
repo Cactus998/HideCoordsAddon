@@ -79,6 +79,9 @@ public class Main extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.SPECTATOR && !AuthMeApi.getInstance().isAuthenticated(player)) {
             teleport(player);
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.setFlySpeed(0);
         }
     }
 
