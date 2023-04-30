@@ -130,25 +130,16 @@ public class Main extends JavaPlugin implements Listener {
             for (Map.Entry<UUID, Location> entry : playerLocations.entrySet()) {
                 UUID uuid = entry.getKey();
                 Location location = entry.getValue();
-                Player player = getPlayer(uuid);
+                Player player = Bukkit.getPlayer(uuid);
                 player.teleport(location);
             }
             for (Map.Entry<UUID, GameMode> entry : playerGamemode.entrySet()) {
                 UUID uuid = entry.getKey();
                 GameMode gameMode = entry.getValue();
-                Player player = getPlayer(uuid);
+                Player player = Bukkit.getPlayer(uuid);
                 player.setGameMode(gameMode);
             }
             Bukkit.shutdown();
         }
-    }
-
-    public Player getPlayer(UUID uuid) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getUniqueId().equals(uuid)) {
-                return player;
-            }
-        }
-        return null;
     }
 }
